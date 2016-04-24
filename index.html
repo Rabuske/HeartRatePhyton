@@ -27,8 +27,23 @@
 <button onclick="myFunction()">Try it</button>
 
 <script>
-function myFunction() {
-    alert("I am an alert box!");
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+var code = getParameterByName('code')
+if (code != null)
+{
+  document.write('<hr />');
+  document.write('<p>' + 'Copy the following code into the application:' );
+  document.write('<p><textarea style="width : 100%;" readonly>' + code + '</textarea>');
+  document.write('<hr />');
 }
 </script>
 
