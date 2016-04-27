@@ -1,0 +1,7 @@
+{
+  "client_id": "227L8L",
+  "client_secret": "85ff31dff9e3318fbac4b6fde5da9c68",
+  "uri_authorization": "https://www.fitbit.com/oauth2/authorize",
+  "uri_redirect": "https://rabuske.github.io/HeartRatePython/",
+  "uri_token": "https://api.fitbit.com/oauth2/token"
+}
