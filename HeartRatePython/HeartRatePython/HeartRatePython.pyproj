@@ -25,7 +25,19 @@
     <Compile Include="AppConfig.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Authorization.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Database.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Fitbit.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HeartRatePython.py" />
+    <Compile Include="Token.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

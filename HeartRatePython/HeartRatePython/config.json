@@ -3,5 +3,7 @@
   "client_secret": "85ff31dff9e3318fbac4b6fde5da9c68",
   "uri_authorization": "https://www.fitbit.com/oauth2/authorize",
   "uri_redirect": "https://rabuske.github.io/HeartRatePython/",
-  "uri_token": "https://api.fitbit.com/oauth2/token"
+  "uri_token": "https://api.fitbit.com/oauth2/token",
+  "uri_heart": "https://api.fitbit.com/1/user/-/activities/heart/date/[date]/[end-date]/1min.json",
+  "database_name" :  "HeartRatePython.db"
 }
