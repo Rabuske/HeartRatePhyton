@@ -8,12 +8,12 @@ class Token(object):
     type = None
     userId  = None
     
-    def __init__(self, userId, accessToken, refreshToken, expiresIn, type, generationDate=None):
+    def __init__(self, userId, accessToken, refreshToken, type, expiresIn, generationDate=None):
         self.userId = userId
         self.accessToken = accessToken
         self.refreshToken = refreshToken
-        self.expiresIn = expiresIn
         self.type = type
+        self.expiresIn = expiresIn
         self.generationDate = generationDate
         if self.generationDate == None:
             self.generationDate = datetime.datetime.utcnow().timestamp()
@@ -32,5 +32,3 @@ class Token(object):
         except KeyError as e:
             return Token(dictionary["user_id"], dictionary["access_token"], dictionary["refresh_token"], dictionary["token_type"], dictionary["expires_in"])        
     
-    def getData(self):
-        return (self.userId, self.accessToken, self.refreshToken, self.type, self.expiresIn, self.generationDate)

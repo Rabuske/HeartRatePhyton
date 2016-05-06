@@ -13,7 +13,7 @@ class Database(object):
 
 #   When creating the object, already connect to the database and initialize/update it
     def __init__(self):
-        self.connection = externalDb.connect(AppConfig().get("database_name"))       
+        self.connection = externalDb.connect(AppConfig().get("database_name"), check_same_thread=False)       
         cursor = self.connection.cursor()
         
         # Check if the database has been initialized, by looking for the 'version' table
@@ -32,8 +32,8 @@ class Database(object):
     def initDb(self):    
         cursor = self.connection.cursor()
         cursor.execute("CREATE TABLE version (version, date)")
-        cursor.execute("CREATE TABLE heart_zone (date, min, max, calories, minutes, name)")
-        cursor.execute("CREATE TABLE heart_intraday (date, time, value)")
+        cursor.execute("CREATE TABLE heart_zone (date, name, min, max, calories, minutes, PRIMARY KEY(date, name))")
+        cursor.execute("CREATE TABLE heart_intraday (date, time, value, PRIMARY KEY(date, time))")
         cursor.execute("CREATE TABLE token (user_id, access_token, refresh_token, token_type, expires_in, request_time)")
         cursor.execute("INSERT  INTO version values (?,?)", (self.version, datetime.datetime.now()))
         cursor.close()
@@ -53,8 +53,7 @@ class Database(object):
         # Delete the existing token for this user 
         cursor.execute("DELETE FROM token WHERE user_id=?", (token.userId,))
         # Insert the new token
-        tokenData = token.getData()
-        cursor.execute("INSERT INTO token VALUES (?, ?, ?, ?, ?, ?)",  tokenData)
+        cursor.execute("INSERT INTO token VALUES (?, ?, ?, ?, ?, ?)",  (token.userId, token.accessToken, token.refreshToken, token.type, token.expiresIn, token.generationDate))
         cursor.close()
         self.connection.commit()
             
@@ -69,15 +68,15 @@ class Database(object):
         return Token.createFromDDIC(result)
 
 #---Heart Rate
-    def saveHeartData(self, heartDataJson):
+    def saveIntraday(self, data):
         cursor = self.connection.cursor()
-        date = None
-        for activity in heartDataJson["activities-heart"]:
-            date = activity["dateTime"]
-            for zone in activity["value"]["heartRateZones"]:
-                cursor.execute("INSERT INTO heart_zone VALUES (?,?,?,?,?,?)", (date, zone["max"],zone["min"], zone["caloriesOut"], zone["minutes"], zone["name"]))
-        for intraday in heartDataJson["activities-heart-intraday"]["dataset"]:
-            cursor.execute("INSERT INTO heart_intraday VALUES (?,?,?)", (date, intraday["time"], intraday["value"]))
+        cursor.executemany("INSERT INTO heart_intraday VALUES (?,?,?)", data)
+        self.connection.commit()
+        cursor.close()
+
+    def saveZones(self, data):
+        cursor = self.connection.cursor()
+        cursor.executemany("INSERT INTO heart_zone VALUES (?,?,?,?,?,?)", data)
         self.connection.commit()
         cursor.close()
 
@@ -90,7 +89,9 @@ class Database(object):
 
     def getIntradayData(self, date):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT time, value FROM heart_intraday WHERE date=? ORDER BY time", (date,))
+        cursor.execute("SELECT * FROM heart_intraday WHERE date=? ORDER BY time", (date,))
         result = cursor.fetchall()
         cursor.close()
+        if result != None and len(result) == 0:
+            result = None
         return result

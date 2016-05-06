@@ -10,8 +10,6 @@ class AppConfigSingleton(object):
         return class_._instance
 
 class AppConfig(AppConfigSingleton):
-    pass
-    
     confData = None
 
     def __init__(self, fileName = None):

@@ -12,17 +12,38 @@ class Fitbit(object):
         self.authorization = Authorization()
         self.database = database
 
-    def getHeartRate(self, startDate, endDate = None):
-        uri = AppConfig().get("uri_heart")
-        uri = uri.replace("[date]", startDate)
-        if endDate != None:
-            uri = uri.replace("[end-date]", endDate)
+    def getHeartIntradayRate(self, date, callback = None):
+        data = self.getHeartRateIntradaytDb(date)
+        if data == None:
+            print("Data not found in database, reaching Fitbit.com")
+            data = self.getHeartRateIntradayOnline(date)
+        if callback != None:
+            callback(data)
         else:
-            uri = uri.replace("[end-date]//", "")
+            return data
 
+    def getHeartRateIntradaytDb(self, date):
+        return self.database.getIntradayData(date)
+
+    def getHeartRateIntradayOnline(self, date):
+        uri = AppConfig().get("uri_heart")
+        uri = uri.replace("[date]", date)
+        uri = uri.replace("[end-date]", date)
         authorizationHeader = self.authorization.getAuthorizationHeader(self.authorization.getToken(self.database))
         response = requests.get(uri, headers={ "Authorization" : authorizationHeader })
-        responseJson = response.json()
-        outfile = open('data.txt', 'w') 
-        json.dump(responseJson, outfile)
-        
+        data = self.formatJson(response.json())
+        self.database.saveIntraday(data[0])
+        self.database.saveZones(data[1])
+        return data[0]
+
+    def formatJson(self, json):
+        date = None
+        intradayData = list()
+        zonesData = list()
+        for activity in json["activities-heart"]:
+            date = activity["dateTime"]
+            for zone in activity["value"]["heartRateZones"]:
+                zonesData.append((date, zone["name"], zone["max"],zone["min"], zone["caloriesOut"], zone["minutes"]))
+        for intraday in json["activities-heart-intraday"]["dataset"]:
+            intradayData.append((date, intraday["time"], intraday["value"]))
+        return (intradayData, zonesData)        
