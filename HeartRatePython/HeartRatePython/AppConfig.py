@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 
 # Singleton metaclass to read the configuration file
 class AppConfigSingleton(object):
