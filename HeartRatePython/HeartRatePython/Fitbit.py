@@ -32,6 +32,8 @@ class Fitbit(object):
         authorizationHeader = self.authorization.getAuthorizationHeader(self.authorization.getToken(self.database))
         response = requests.get(uri, headers={ "Authorization" : authorizationHeader })
         data = self.formatJson(response.json())
+        if data == None:
+            return None
         self.database.saveIntraday(data[0])
         self.database.saveZones(data[1])
         return data[0]
@@ -43,6 +45,8 @@ class Fitbit(object):
         for activity in json["activities-heart"]:
             date = activity["dateTime"]
             for zone in activity["value"]["heartRateZones"]:
+                if "caloriesOut" not in zone:
+                    return None
                 zonesData.append((date, zone["name"], zone["max"],zone["min"], zone["caloriesOut"], zone["minutes"]))
         for intraday in json["activities-heart-intraday"]["dataset"]:
             intradayData.append((date, intraday["time"], intraday["value"]))

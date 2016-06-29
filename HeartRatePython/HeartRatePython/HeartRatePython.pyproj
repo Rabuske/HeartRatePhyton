@@ -35,6 +35,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="HeartRatePython.py" />
+    <Compile Include="Plot.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Token.py">
       <SubType>Code</SubType>
     </Compile>

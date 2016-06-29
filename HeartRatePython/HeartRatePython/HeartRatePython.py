@@ -1,16 +1,26 @@
 from Fitbit import Fitbit
 from Database import Database
-import json
-import threading
+from Plot import Plot
+import datetime
 
-def callback(data):
-    print(data)
-    pass
 
 db = Database()
 fitbit = Fitbit(db)
-thread = threading.Thread(target = fitbit.getHeartIntradayRate, args = ("2016-05-11", callback))
-thread.start()
-print("Hey Girl Hey")
-thread.join()
+plot = Plot()
 
+while True:
+    date = input("Enter a date (YYYY-MM-DD): ")
+
+    try:
+        datetime.datetime.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        print("Incorrect data format, should be YYYY-MM-DD")
+        continue
+    
+    heartData = fitbit.getHeartIntradayRate(date)
+    
+    if heartData == None:
+        print("No data returned for ", date)   
+        continue
+
+    plot.plot(heartData)
